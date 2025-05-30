@@ -1,0 +1,9 @@
+# ignored files
+*.tfstate
+*.tfstate.backup
+.terraform
+.idea
+*.iml
+*.hcl
+/*.terraform.tfstate.lock.info
+/*.tfstate.lock.info

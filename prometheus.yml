@@ -1,0 +1,8 @@
+prometheus-pushgateway:
+  ingress:
+    enabled: true
+    className: nginx
+    hosts:
+    %{ for host in PUSH_GATEWAY_INGRESS_HOSTS }
+      - ${host}
+    %{ endfor }
