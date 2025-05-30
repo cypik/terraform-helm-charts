@@ -309,12 +309,12 @@ variable "loki_values_file" {
 
 
 variable "grafana_loki_storage_name" {
-  type = string
+  type    = string
   default = "jdhdjhd8384839hf"
 }
 
 variable "grafana_loki_container_name" {
-  type = string
+  type    = string
   default = "jknqwjkdqwkd"
 }
 

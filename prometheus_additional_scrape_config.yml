@@ -1,0 +1,11 @@
+extraScrapeConfigs: |
+  %{ for job in SCRAPE_CONFIG }
+  - job_name: "${job.job_name}"
+    scrape_interval: "${job.scrape_interval}"
+    metrics_path: ${job.metrics_path}
+    static_configs:
+      - targets:
+      %{ for target in job.targets }
+        - "${target}"
+      %{ endfor }
+  %{ endfor }

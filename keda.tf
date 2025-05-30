@@ -6,7 +6,7 @@ resource "helm_release" "keda" {
   namespace        = var.keda_namespace
   create_namespace = true
   version          = var.keda_chart_version
-  timeout = 600
+  timeout          = 600
 
   values = [
     var.keda_yml_file == null ? file("${path.module}/keda.yaml") : "${var.keda_yml_file}"
