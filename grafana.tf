@@ -23,7 +23,7 @@ resource "helm_release" "grafana" {
       INGRESS_HOSTS        = var.grafana_ingress_hosts,
       datasources          = var.grafana_datasources,
       grafana_loki_enabled = var.grafana_loki_enabled,
-      storage_class = var.grafana_efs_storage_class_name,
+      storage_class        = var.grafana_efs_storage_class_name,
     }),
     var.grafana_extra_yml != null ? var.grafana_extra_yml : ""
   ]
