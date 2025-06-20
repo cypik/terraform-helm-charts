@@ -67,4 +67,11 @@ ingress:
     %{ endfor }
   path: "/grafana"
 
+persistence:
+  enabled: true
+  storageClassName: gp2
+  accessModes:
+    - ReadWriteOnce
+  size: 5Gi
+
 assertNoLeakedSecrets: false
