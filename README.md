@@ -40,17 +40,18 @@ module "helm-charts" {
 }
 
 <!-- BEGIN_TF_DOCS -->
+
 ## Requirements
 
 No requirements.
 
 ## Providers
 
-| Name | Version |
-|------|---------|
-| <a name="provider_helm"></a> [helm](#provider\_helm) | n/a |
-| <a name="provider_null"></a> [null](#provider\_null) | n/a |
-| <a name="provider_random"></a> [random](#provider\_random) | n/a |
+| Name     | Version |
+|----------|---------|
+| helm     | n/a     |
+| null     | n/a     |
+| random   | n/a     |
 
 ## Modules
 
@@ -58,80 +59,78 @@ No modules.
 
 ## Resources
 
-| Name | Type |
-|------|------|
-| [helm_release.cert-manager](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
-| [helm_release.grafana](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
-| [helm_release.keda](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
-| [helm_release.loki](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
-| [helm_release.nginx](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
-| [helm_release.prometheus](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
-| [helm_release.promtail](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
+| Name                                                                                     | Type     |
+|------------------------------------------------------------------------------------------|----------|
+| [helm_release.cert-manager](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release)       | resource |
+| [helm_release.grafana](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release)            | resource |
+| [helm_release.keda](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release)               | resource |
+| [helm_release.loki](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release)               | resource |
+| [helm_release.nginx](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release)              | resource |
+| [helm_release.prometheus](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release)         | resource |
+| [helm_release.promtail](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release)           | resource |
 | [null_resource.cert-manager-cluster-issuer](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [random_password.grafana_admin_password](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) | resource |
 
 ## Inputs
 
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| <a name="input_cert_manager_email"></a> [cert\_manager\_email](#input\_cert\_manager\_email) | Your email address to use for cert manager | `any` | `null` | no |
-| <a name="input_cert_manager_enabled"></a> [cert\_manager\_enabled](#input\_cert\_manager\_enabled) | Enable cert-manager deployment | `bool` | `false` | no |
-| <a name="input_cert_manager_leader_election_namespace"></a> [cert\_manager\_leader\_election\_namespace](#input\_cert\_manager\_leader\_election\_namespace) | The namespace used for the leader election lease. Change to cert-manager for GKE Autopilot | `string` | `"cert-manager"` | no |
-| <a name="input_cert_manager_resources"></a> [cert\_manager\_resources](#input\_cert\_manager\_resources) | n/a | <pre>map(object({<br>    cpu    = string<br>    memory = string<br>  }))</pre> | `null` | no |
-| <a name="input_cert_manager_version"></a> [cert\_manager\_version](#input\_cert\_manager\_version) | The version of the Cert-Manager Helm chart to be deployed, used for automating the issuance and renewal of TLS certificates. | `string` | `"1.16.3"` | no |
-| <a name="input_cloud_provider"></a> [cloud\_provider](#input\_cloud\_provider) | Choose between aws or azure | `string` | `"azure"` | no |
-| <a name="input_datadog_version"></a> [datadog\_version](#input\_datadog\_version) | The version of the Datadog Helm chart to be deployed, used for monitoring, security, and observability in Kubernetes environments. | `string` | `"3.88.3"` | no |
-| <a name="input_enable_grafana"></a> [enable\_grafana](#input\_enable\_grafana) | Enable Grafana deployment | `bool` | `true` | no |
-| <a name="input_enable_keda"></a> [enable\_keda](#input\_enable\_keda) | Whether to deploy KEDA | `bool` | `false` | no |
-| <a name="input_enable_nginx"></a> [enable\_nginx](#input\_enable\_nginx) | Whether to enable nginx ingress | `bool` | `true` | no |
-| <a name="input_grafana_admin_password"></a> [grafana\_admin\_password](#input\_grafana\_admin\_password) | The Password of Grafana for login Dashboard | `string` | `"Cypik"` | no |
-| <a name="input_grafana_admin_user"></a> [grafana\_admin\_user](#input\_grafana\_admin\_user) | The User name of Grafana for login Dashboard | `string` | `"Cypik"` | no |
-| <a name="input_grafana_chart_version"></a> [grafana\_chart\_version](#input\_grafana\_chart\_version) | Grafana Helm chart version | `string` | `"7.3.0"` | no |
-| <a name="input_grafana_datasources"></a> [grafana\_datasources](#input\_grafana\_datasources) | n/a | <pre>list(object({<br>    name      = string<br>    type      = string<br>    url       = string<br>    access    = string<br>    isDefault = bool<br>  }))</pre> | `[]` | no |
-| <a name="input_grafana_efs_enable"></a> [grafana\_efs\_enable](#input\_grafana\_efs\_enable) | Enable EFS storage for Grafana | `bool` | `false` | no |
-| <a name="input_grafana_efs_storage_class_name"></a> [grafana\_efs\_storage\_class\_name](#input\_grafana\_efs\_storage\_class\_name) | If EFS is needed pass EFS storage class, but make sure efs and efs driver deployed | `string` | `"gp2"` | no |
-| <a name="input_grafana_enabled"></a> [grafana\_enabled](#input\_grafana\_enabled) | Enable grafana | `bool` | `false` | no |
-| <a name="input_grafana_extra_yml"></a> [grafana\_extra\_yml](#input\_grafana\_extra\_yml) | Grafana Datasources as Yaml | `any` | `null` | no |
-| <a name="input_grafana_google_auth_client_id"></a> [grafana\_google\_auth\_client\_id](#input\_grafana\_google\_auth\_client\_id) | Add Google Auth client id | `string` | `""` | no |
-| <a name="input_grafana_google_auth_client_secret"></a> [grafana\_google\_auth\_client\_secret](#input\_grafana\_google\_auth\_client\_secret) | Add Google Auth client secret | `string` | `""` | no |
-| <a name="input_grafana_ingress_class_name"></a> [grafana\_ingress\_class\_name](#input\_grafana\_ingress\_class\_name) | Ingress class name for Grafana | `string` | `"nginx"` | no |
-| <a name="input_grafana_ingress_enabled"></a> [grafana\_ingress\_enabled](#input\_grafana\_ingress\_enabled) | Enable grafana ingress | `bool` | `false` | no |
-| <a name="input_grafana_ingress_hosts"></a> [grafana\_ingress\_hosts](#input\_grafana\_ingress\_hosts) | Add grafana ingress hosts | `list` | `[]` | no |
-| <a name="input_grafana_loki_bucket_name"></a> [grafana\_loki\_bucket\_name](#input\_grafana\_loki\_bucket\_name) | Name for the S3 bucket | `string` | `""` | no |
-| <a name="input_grafana_loki_container_name"></a> [grafana\_loki\_container\_name](#input\_grafana\_loki\_container\_name) | n/a | `string` | `"jknqwjkdqwkd"` | no |
-| <a name="input_grafana_loki_enabled"></a> [grafana\_loki\_enabled](#input\_grafana\_loki\_enabled) | Enable grafana loki | `bool` | `true` | no |
-| <a name="input_grafana_loki_storage_name"></a> [grafana\_loki\_storage\_name](#input\_grafana\_loki\_storage\_name) | n/a | `string` | `"jdhdjhd8384839hf"` | no |
-| <a name="input_grafana_loki_yml_file"></a> [grafana\_loki\_yml\_file](#input\_grafana\_loki\_yml\_file) | n/a | `any` | `null` | no |
-| <a name="input_grafana_name"></a> [grafana\_name](#input\_grafana\_name) | Name of the Grafana release | `string` | `"grafana"` | no |
-| <a name="input_grafana_persistence_storage"></a> [grafana\_persistence\_storage](#input\_grafana\_persistence\_storage) | Enable persistence storage for Grafana | `bool` | `true` | no |
-| <a name="input_grafana_values_file"></a> [grafana\_values\_file](#input\_grafana\_values\_file) | Optional values YAML file for Grafana | `string` | `null` | no |
-| <a name="input_grafana_version"></a> [grafana\_version](#input\_grafana\_version) | The version of the Grafana Helm chart to be deployed, used for data visualization and monitoring dashboards. | `string` | `"8.8.5"` | no |
-| <a name="input_ingress_nginx_version"></a> [ingress\_nginx\_version](#input\_ingress\_nginx\_version) | The version of the Ingress-NGINX Helm chart to be deployed, used for managing ingress traffic in Kubernetes. | `string` | `"4.12.1"` | no |
-| <a name="input_keda_chart_version"></a> [keda\_chart\_version](#input\_keda\_chart\_version) | Version of the KEDA chart | `string` | `"2.13.0"` | no |
-| <a name="input_keda_name"></a> [keda\_name](#input\_keda\_name) | Name of the Helm release for KEDA | `string` | `"keda"` | no |
-| <a name="input_keda_namespace"></a> [keda\_namespace](#input\_keda\_namespace) | Namespace to install KEDA into | `string` | `"keda"` | no |
-| <a name="input_keda_version"></a> [keda\_version](#input\_keda\_version) | The version of the KEDA Helm chart to be deployed, used for Kubernetes-based Event-Driven Autoscaling. | `string` | `"2.16.1"` | no |
-| <a name="input_keda_yml_file"></a> [keda\_yml\_file](#input\_keda\_yml\_file) | Optional custom values YAML file for KEDA | `string` | `null` | no |
-| <a name="input_kubecost_enabled"></a> [kubecost\_enabled](#input\_kubecost\_enabled) | A boolean to enable or disable the deployment of Kubecost, a tool for monitoring and managing Kubernetes cost and resource usage. | `bool` | `false` | no |
-| <a name="input_kubecost_version"></a> [kubecost\_version](#input\_kubecost\_version) | The version of the Kubecost Helm chart to be deployed, used for Kubernetes cost management and optimization. | `string` | `"2.5.3"` | no |
-| <a name="input_loki_chart_version"></a> [loki\_chart\_version](#input\_loki\_chart\_version) | n/a | `string` | `"5.43.3"` | no |
-| <a name="input_loki_values_file"></a> [loki\_values\_file](#input\_loki\_values\_file) | n/a | `any` | `null` | no |
-| <a name="input_loki_version"></a> [loki\_version](#input\_loki\_version) | The version of the Loki Helm chart to be deployed, used for log aggregation and analysis. | `string` | `"6.25.0"` | no |
-| <a name="input_nginx_max_replicas"></a> [nginx\_max\_replicas](#input\_nginx\_max\_replicas) | Maximum number of Nginx Replicas | `number` | `11` | no |
-| <a name="input_nginx_min_replicas"></a> [nginx\_min\_replicas](#input\_nginx\_min\_replicas) | Minimum number of Nginx Replicas | `number` | `2` | no |
-| <a name="input_nginx_name"></a> [nginx\_name](#input\_nginx\_name) | Release name for the installed helm chart | `string` | `"nginx"` | no |
-| <a name="input_nginx_yml_file"></a> [nginx\_yml\_file](#input\_nginx\_yml\_file) | n/a | `any` | `null` | no |
-| <a name="input_opentelemetry_collector_version"></a> [opentelemetry\_collector\_version](#input\_opentelemetry\_collector\_version) | The version of the OpenTelemetry Collector Helm chart to be deployed, used for collecting telemetry data (logs, metrics, and traces) from various sources. | `string` | `"0.115.0"` | no |
-| <a name="input_otel_yml_file"></a> [otel\_yml\_file](#input\_otel\_yml\_file) | n/a | `any` | `null` | no |
-| <a name="input_prometheus_additional_scrape_configs"></a> [prometheus\_additional\_scrape\_configs](#input\_prometheus\_additional\_scrape\_configs) | Add additional scrape for configuration for prometheus if needed | <pre>list(object({<br>    job_name        = string<br>    targets         = list(string)<br>    scrape_interval = string<br>    metrics_path    = string<br>  }))</pre> | `[]` | no |
-| <a name="input_prometheus_enabled"></a> [prometheus\_enabled](#input\_prometheus\_enabled) | Enable prometheus | `bool` | `false` | no |
-| <a name="input_prometheus_persistence_storage"></a> [prometheus\_persistence\_storage](#input\_prometheus\_persistence\_storage) | Enable persistence storage for Prometheus | `bool` | `false` | no |
-| <a name="input_prometheus_version"></a> [prometheus\_version](#input\_prometheus\_version) | The version of the Prometheus Helm chart to be deployed, used for monitoring and alerting in Kubernetes. | `string` | `"27.1.0"` | no |
-| <a name="input_promtail_version"></a> [promtail\_version](#input\_promtail\_version) | The version of the Promtail Helm chart to be deployed, used as a log collector to send logs to Loki. | `string` | `"6.16.6"` | no |
-| <a name="input_pushgateway_ingress_host"></a> [pushgateway\_ingress\_host](#input\_pushgateway\_ingress\_host) | List of hosts for prometheus push gateway ingress | `list` | `[]` | no |
-| <a name="input_storage_class"></a> [storage\_class](#input\_storage\_class) | Storage Class to use for Persistence | `string` | `"managed-csi"` | no |
+| Name                                | Description                                                                                                      | Type     | Default         | Required |
+|-------------------------------------|------------------------------------------------------------------------------------------------------------------|----------|------------------|----------|
+| cert_manager_email                  | Your email address to use for cert manager                                                                      | any      | null             | no       |
+| cert_manager_enabled                | Enable cert-manager deployment                                                                                  | bool     | false            | no       |
+| cert_manager_leader_election_namespace | The namespace used for the leader election lease. Change to cert-manager for GKE Autopilot                   | string   | "cert-manager"   | no       |
+| cert_manager_resources              | Resource limits for cert-manager                                                                                | map      | null             | no       |
+| cert_manager_version                | Version of the Cert-Manager Helm chart                                                                          | string   | "1.16.3"         | no       |
+| cloud_provider                      | Choose between aws or azure                                                                                     | string   | "azure"          | no       |
+| datadog_version                     | Datadog Helm chart version                                                                                      | string   | "3.88.3"         | no       |
+| enable_grafana                      | Enable Grafana deployment                                                                                       | bool     | true             | no       |
+| enable_keda                         | Whether to deploy KEDA                                                                                          | bool     | false            | no       |
+| enable_nginx                        | Whether to enable nginx ingress                                                                                 | bool     | true             | no       |
+| grafana_admin_password              | Grafana admin password                                                                                          | string   | "Cypik"          | no       |
+| grafana_admin_user                  | Grafana admin user                                                                                              | string   | "Cypik"          | no       |
+| grafana_chart_version               | Grafana Helm chart version                                                                                      | string   | "7.3.0"          | no       |
+| grafana_datasources                 | List of Grafana datasources                                                                                     | list     | []               | no       |
+| grafana_efs_enable                  | Enable EFS for Grafana                                                                                          | bool     | false            | no       |
+| grafana_efs_storage_class_name      | EFS storage class name                                                                                          | string   | "gp2"            | no       |
+| grafana_enabled                     | Enable Grafana                                                                                                  | bool     | false            | no       |
+| grafana_extra_yml                   | Extra Grafana configuration                                                                                     | any      | null             | no       |
+| grafana_google_auth_client_id       | Google auth client ID                                                                                           | string   | ""               | no       |
+| grafana_google_auth_client_secret   | Google auth client secret                                                                                       | string   | ""               | no       |
+| grafana_ingress_class_name          | Ingress class name                                                                                              | string   | "nginx"          | no       |
+| grafana_ingress_enabled             | Enable Grafana ingress                                                                                          | bool     | false            | no       |
+| grafana_ingress_hosts               | Grafana ingress hosts                                                                                           | list     | []               | no       |
+| grafana_loki_bucket_name            | Loki S3 bucket name                                                                                             | string   | ""               | no       |
+| grafana_loki_container_name         | Loki container name                                                                                             | string   | "jknqwjkdqwkd"   | no       |
+| grafana_loki_enabled                | Enable Grafana Loki                                                                                             | bool     | true             | no       |
+| grafana_loki_storage_name           | Loki storage name                                                                                               | string   | "jdhdjhd8384839hf" | no     |
+| grafana_loki_yml_file               | Loki configuration yaml                                                                                         | any      | null             | no       |
+| grafana_name                        | Grafana release name                                                                                            | string   | "grafana"        | no       |
+| grafana_persistence_storage         | Enable persistence for Grafana                                                                                  | bool     | true             | no       |
+| grafana_values_file                 | Optional values YAML for Grafana                                                                                | string   | null             | no       |
+| grafana_version                     | Grafana Helm chart version                                                                                      | string   | "8.8.5"          | no       |
+| ingress_nginx_version               | Ingress-NGINX Helm chart version                                                                                | string   | "4.12.1"         | no       |
+| keda_chart_version                  | KEDA chart version                                                                                              | string   | "2.13.0"         | no       |
+| keda_name                           | KEDA Helm release name                                                                                          | string   | "keda"           | no       |
+| keda_namespace                      | KEDA namespace                                                                                                  | string   | "keda"           | no       |
+| keda_version                        | KEDA Helm chart version                                                                                         | string   | "2.16.1"         | no       |
+| keda_yml_file                       | KEDA values file                                                                                                | string   | null             | no       |
+| kubecost_enabled                    | Enable Kubecost                                                                                                 | bool     | false            | no       |
+| kubecost_version                    | Kubecost Helm chart version                                                                                     | string   | "2.5.3"          | no       |
+| loki_chart_version                  | Loki chart version                                                                                              | string   | "5.43.3"         | no       |
+| loki_values_file                    | Loki values file                                                                                                | any      | null             | no       |
+| loki_version                        | Loki Helm chart version                                                                                         | string   | "6.25.0"         | no       |
+| nginx_max_replicas                  | Max Nginx replicas                                                                                              | number   | 11               | no       |
+| nginx_min_replicas                  | Min Nginx replicas                                                                                              | number   | 2                | no       |
+| nginx_name                          | Nginx Helm release name                                                                                         | string   | "nginx"          | no       |
+| nginx_yml_file                      | Nginx values file                                                                                               | any      | null             | no       |
+| opentelemetry_collector_version     | OpenTelemetry Collector chart version                                                                           | string   | "0.115.0"        | no       |
+| otel_yml_file                       | OpenTelemetry values file                                                                                       | any      | null             | no       |
+| prometheus_additional_scrape_configs | Additional scrape configs for Prometheus                                                                       | list     | []               | no       |
+| prometheus_enabled                  | Enable Prometheus                                                                                               | bool     | false            | no       |
+| prometheus_persistence_storage      | Enable Prometheus persistence                                                                                   | bool     | false            | no       |
+| prometheus_version                  | Prometheus Helm chart version                                                                                   | string   | "27.1.0"         | no       |
+| promtail_version                    | Promtail Helm chart version                                                                                     | string   | "6.16.6"         | no       |
+| pushgateway_ingress_host            | Prometheus Pushgateway ingress hosts                                                                            | list     | []               | no       |
+| storage_class                       | Storage Class                                                                                                   | string   | "managed-csi"    | no       |
 
-## Outputs
 
-No outputs.
 <!-- END_TF_DOCS -->

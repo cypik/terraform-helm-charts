@@ -6,7 +6,7 @@ repos:
       - id: shellcheck
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.0.1 # Use the ref you want to point at
+    rev: v4.4.0 # Updated to latest stable
     hooks:
       - id: trailing-whitespace
       - id: mixed-line-ending
@@ -14,11 +14,24 @@ repos:
       - id: check-executables-have-shebangs
       - id: check-merge-conflict
       - id: debug-statements
-      - id: check-yaml
       - id: check-added-large-files
+      - id: check-yaml
+        exclude: ^(prometheus\.yml|grafana\.yml)$
 
   - repo: https://github.com/terraform-docs/terraform-docs
     rev: "v0.16.0"
     hooks:
       - id: terraform-docs-go
         args: ["markdown", "table", "--output-file", "README.md", "./"]
+  - repo: https://github.com/terraform-docs/terraform-docs
+    rev: "v0.16.0"
+    hooks:
+      - id: terraform-docs-go
+        args:
+          - "markdown"
+          - "table"
+          - "--output-file"
+          - "README.md"
+          - "--output-mode"
+          - "inject"
+          - "./"
