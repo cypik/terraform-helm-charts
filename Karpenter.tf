@@ -116,6 +116,7 @@ resource "aws_iam_instance_profile" "karpenter_node" {
 
 # SQS Queue for Spot Interruption Handling
 resource "aws_sqs_queue" "karpenter_interruption" {
+  count = var.enabled_karpenter ? 1 : 0
   name = "${var.cluster_name}-karpenter-interruption"
 }
 
