@@ -151,7 +151,7 @@ resource "helm_release" "karpenter" {
 
   set {
     name  = "settings.aws.interruptionQueueName"
-    value = aws_sqs_queue.karpenter_interruption.name
+    value = aws_sqs_queue.karpenter_interruption[0].name
   }
 
   set {
