@@ -1,7 +1,7 @@
 # Cluster and Auth Data
 
 data "aws_eks_cluster" "this" {
-  region = "eu-west-1"
+  region = var.region
   name   = var.cluster_name
 }
 
