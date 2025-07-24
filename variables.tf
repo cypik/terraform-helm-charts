@@ -339,9 +339,3 @@ variable "grafana_ingress_class_name" {
   default     = "nginx"
   description = "Ingress class name for Grafana"
 }
-
-variable "region" {
-  description = "AWS region to deploy resources in"
-  type        = string
-  default     = "us-east-1"
-}
