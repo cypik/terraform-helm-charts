@@ -70,7 +70,7 @@ variable "grafana_google_auth_client_secret" {
 }
 
 variable "grafana_persistence_storage" {
-  default     = true
+  default     = false
   description = "Enable persistence storage for Grafana"
 }
 
@@ -84,7 +84,7 @@ variable "grafana_efs_enable" {
   description = "Enable EFS storage for Grafana"
 }
 variable "grafana_efs_storage_class_name" {
-  default     = "gp2"
+  default     = ""
   description = "If EFS is needed pass EFS storage class, but make sure efs and efs driver deployed"
 }
 
@@ -324,7 +324,13 @@ variable "cert_manager_enabled" {
   default     = false
 }
 
-variable "grafana_ingress_class_name" {
-  default     = "nginx"
-  description = "Ingress class name for Grafana"
+variable "cluster_name" {
+  description = "The name of the existing EKS cluster"
+  type        = string
+}
+
+variable "enabled_karpenter" {
+  description = "Enable or disable the Karpenter provisioning"
+  type        = bool
+  default     = false
 }
