@@ -9,6 +9,14 @@ resource "helm_release" "keda" {
   timeout          = 600
 
   values = [
-    var.keda_yml_file == null ? file("${path.module}/keda.yaml") : "${var.keda_yml_file}"
+    yamlencode({
+      prometheus = {
+        metricServer = {
+          enabled = true
+        }
+      }
+    })
   ]
+
+  depends_on = [helm_release.metrics_server]
 }
