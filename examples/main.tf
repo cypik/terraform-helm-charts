@@ -7,8 +7,12 @@ module "helm-charts" {
   prometheus_enabled   = false
   cert_manager_enabled = false
   enabled_karpenter    = false
+  alb_ingress_enabled  = false
   cert_manager_email   = "example@gmail.com"
-  cluster_name         = tostring(data.aws_eks_cluster.this.name) # if enabled_karpenter
+  cluster_name         = tostring(data.aws_eks_cluster.this.name)
+  vpc_id               = ""
+  region               = ""
+
 
 
 }

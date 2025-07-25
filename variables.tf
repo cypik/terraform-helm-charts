@@ -339,3 +339,21 @@ variable "grafana_ingress_class_name" {
   default     = "nginx"
   description = "Ingress class name for Grafana"
 }
+
+
+variable "region" {
+  description = "AWS region where EKS and VPC are deployed"
+  type        = string
+}
+
+variable "vpc_id" {
+  description = "VPC ID where the ALB Ingress Controller will be deployed"
+  type        = string
+}
+
+
+variable "alb_ingress_enabled" {
+  description = "Enable or disable ALB Ingress Controller"
+  type        = bool
+  default     = false
+}
