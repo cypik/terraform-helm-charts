@@ -58,6 +58,8 @@ resource "kubernetes_service_account" "aws_lb_controller_sa" {
       "eks.amazonaws.com/role-arn" = aws_iam_role.alb_ingress_controller[0].arn
     }
   }
+
+  depends_on = [aws_iam_role.alb_ingress_controller]
 }
 
 resource "helm_release" "aws_load_balancer_controller" {
@@ -67,6 +69,8 @@ resource "helm_release" "aws_load_balancer_controller" {
   chart      = "aws-load-balancer-controller"
   namespace  = "kube-system"
   version    = "1.7.1"
+
+  depends_on = [kubernetes_service_account.aws_lb_controller_sa]
 
   set {
     name  = "clusterName"
@@ -92,7 +96,5 @@ resource "helm_release" "aws_load_balancer_controller" {
     name  = "vpcId"
     value = var.vpc_id
   }
-
-  depends_on = [kubernetes_service_account.aws_lb_controller_sa]
 
 }
