@@ -357,3 +357,10 @@ variable "alb_ingress_enabled" {
   type        = bool
   default     = false
 }
+
+
+variable "enabled_metrics_server" {
+  description = "Enable or disable the metrics-server Helm chart"
+  type        = bool
+  default     = false
+}
