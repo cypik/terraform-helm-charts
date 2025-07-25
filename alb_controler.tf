@@ -92,4 +92,6 @@ resource "helm_release" "aws_load_balancer_controller" {
     name  = "vpcId"
     value = var.vpc_id
   }
+
+  depends_on = [kubernetes_service_account.aws_lb_controller_sa]
 }
