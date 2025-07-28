@@ -369,3 +369,18 @@ variable "calico_enabled" {
   type    = bool
   default = false
 }
+
+variable "csi_secrets_store_enabled" {
+  default     = false
+  description = "Specify whether the CSI driver is enabled on the EKS cluster"
+}
+
+variable "csi_enabled_namespaces" {
+  type    = list(string)
+  default = []
+}
+
+variable "csi_secrets_store_version" {
+  default     = "1.4.6"
+  description = "The version of the CSI store helm chart"
+}
