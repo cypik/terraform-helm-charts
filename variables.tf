@@ -364,3 +364,8 @@ variable "enabled_metrics_server" {
   type        = bool
   default     = false
 }
+
+variable "calico_enabled" {
+  type    = bool
+  default = false
+}

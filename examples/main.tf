@@ -8,6 +8,7 @@ module "helm-charts" {
   cert_manager_enabled   = false
   enabled_karpenter      = false
   alb_ingress_enabled    = false
+  calico_enabled         = false
   enabled_metrics_server = true
   cert_manager_email     = "example@gmail.com"
   cluster_name           = tostring(data.aws_eks_cluster.this.name)
