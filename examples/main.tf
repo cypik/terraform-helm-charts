@@ -10,6 +10,7 @@ module "helm-charts" {
   alb_ingress_enabled       = false
   calico_enabled            = false
   csi_secrets_store_enabled = false
+  csi_enabled_namespaces    = ["test"]
   enabled_metrics_server    = true
   cert_manager_email        = "example@gmail.com"
   cluster_name              = tostring(data.aws_eks_cluster.this.name)
