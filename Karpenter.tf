@@ -40,36 +40,123 @@ resource "aws_iam_role_policy" "karpenter_controller_policy" {
     Version = "2012-10-17",
     Statement = [
       {
-        Effect = "Allow",
+        Sid    = "Karpenter"
+        Effect = "Allow"
         Action = [
+          "ssm:GetParameter",
+          "ec2:DescribeImages",
+          "ec2:RunInstances",
+          "ec2:DescribeSubnets",
+          "ec2:DescribeSecurityGroups",
+          "ec2:DescribeLaunchTemplates",
+          "ec2:DescribeInstances",
+          "ec2:DescribeInstanceTypes",
+          "ec2:DescribeInstanceTypeOfferings",
+          "ec2:DeleteLaunchTemplate",
+          "ec2:CreateTags",
           "ec2:CreateLaunchTemplate",
           "ec2:CreateFleet",
-          "ec2:RunInstances",
-          "ec2:CreateTags",
-          "ec2:TerminateInstances",
-          "ec2:Describe*",
-          "ssm:GetParameter",
-          "iam:PassRole",
-          "pricing:GetProducts",
           "ec2:DescribeSpotPriceHistory",
-          "ec2:DescribeAvailabilityZones",
-          "ec2:DescribeInstanceTypeOfferings",
-          "ec2:DescribeLaunchTemplates",
-          "ec2:DescribeLaunchTemplateVersions",
-          "eks:DescribeCluster"
-        ],
+          "pricing:GetProducts"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid      = "ConditionalEC2Termination"
+        Effect   = "Allow"
+        Action   = "ec2:TerminateInstances"
+        Resource = "*"
+        Condition = {
+          StringLike = {
+            "ec2:ResourceTag/karpenter.sh/nodepool" = "*"
+          }
+        }
+      },
+      {
+        Sid      = "PassNodeIAMRole"
+        Effect   = "Allow"
+        Action   = "iam:PassRole"
+        Resource = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/KarpenterNodeRole-${var.cluster_name}"
+      },
+      {
+        Sid      = "EKSClusterEndpointLookup"
+        Effect   = "Allow"
+        Action   = "eks:DescribeCluster"
+        Resource = "arn:aws:eks:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:cluster/${var.cluster_name}"
+      },
+      {
+        Sid    = "AllowScopedInstanceProfileCreationActions"
+        Effect = "Allow"
+        Action = [
+          "iam:CreateInstanceProfile"
+        ]
+        Resource = "*"
+        Condition = {
+          StringEquals = {
+            "aws:RequestTag/kubernetes.io/cluster/${var.cluster_name}" = "owned",
+            "aws:RequestTag/topology.kubernetes.io/region"             = "${data.aws_region.current.name}"
+          }
+          StringLike = {
+            "aws:RequestTag/karpenter.k8s.aws/ec2nodeclass" = "*"
+          }
+        }
+      },
+      {
+        Sid    = "AllowScopedInstanceProfileTagActions"
+        Effect = "Allow"
+        Action = [
+          "iam:TagInstanceProfile"
+        ]
+        Resource = "*"
+        Condition = {
+          StringEquals = {
+            "aws:ResourceTag/kubernetes.io/cluster/${var.cluster_name}" = "owned",
+            "aws:ResourceTag/topology.kubernetes.io/region"             = "${data.aws_region.current.name}",
+            "aws:RequestTag/kubernetes.io/cluster/${var.cluster_name}"  = "owned",
+            "aws:RequestTag/topology.kubernetes.io/region"              = "${data.aws_region.current.name}"
+          }
+          StringLike = {
+            "aws:ResourceTag/karpenter.k8s.aws/ec2nodeclass" = "*",
+            "aws:RequestTag/karpenter.k8s.aws/ec2nodeclass"  = "*"
+          }
+        }
+      },
+      {
+        Sid    = "AllowScopedInstanceProfileActions"
+        Effect = "Allow"
+        Action = [
+          "iam:AddRoleToInstanceProfile",
+          "iam:RemoveRoleFromInstanceProfile",
+          "iam:DeleteInstanceProfile"
+        ]
+        Resource = "*"
+        Condition = {
+          StringEquals = {
+            "aws:ResourceTag/kubernetes.io/cluster/${var.cluster_name}" = "owned",
+            "aws:ResourceTag/topology.kubernetes.io/region"             = "${data.aws_region.current.name}"
+          }
+          StringLike = {
+            "aws:ResourceTag/karpenter.k8s.aws/ec2nodeclass" = "*"
+          }
+        }
+      },
+      {
+        Sid      = "AllowInstanceProfileReadActions"
+        Effect   = "Allow"
+        Action   = "iam:GetInstanceProfile"
         Resource = "*"
       }
     ]
   })
 }
 
+
 # ---------- Karpenter Node IAM Role ----------
 
 
 resource "aws_iam_role" "karpenter_node" {
   count = var.enabled_karpenter ? 1 : 0
-  name  = "karpenter-node-role-${var.cluster_name}"
+  name  = "KarpenterNodeRole-${var.cluster_name}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -119,122 +206,40 @@ resource "helm_release" "karpenter" {
   count            = var.enabled_karpenter ? 1 : 0
   name             = "karpenter"
   namespace        = "karpenter"
-  repository       = "https://charts.karpenter.sh"
+  repository       = "oci://public.ecr.aws/karpenter"
   chart            = "karpenter"
-  version          = "0.16.1"
+  version          = "1.6.1"
   create_namespace = true
 
-
-  set {
-    name  = "settings.clusterName"
-    value = data.aws_eks_cluster.this.name
-  }
-
-  set {
-    name  = "settings.clusterEndpoint"
-    value = data.aws_eks_cluster.this.endpoint
-  }
-
-  set {
-    name  = "settings.aws.defaultInstanceProfile"
-    value = aws_iam_instance_profile.karpenter_node[0].name
-  }
-
-  set {
-    name  = "settings.aws.interruptionQueueName"
-    value = aws_sqs_queue.karpenter_interruption[0].name
-  }
-
-  set {
-    name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
-    value = aws_iam_role.karpenter[0].arn
-    type  = "string"
-  }
-
-
-  set {
-    name  = "controller.nodeSelector.eks\\.amazonaws\\.com/compute-type"
-    value = "ec2"
-  }
-
-  set {
-    name  = "controller.tolerations[0].key"
-    value = "eks.amazonaws.com/compute-type"
-  }
-
-  set {
-    name  = "controller.tolerations[0].operator"
-    value = "NotEqual"
-  }
-
-  set {
-    name  = "controller.tolerations[0].value"
-    value = "fargate"
-  }
-
-  set {
-    name  = "controller.tolerations[0].effect"
-    value = "NoSchedule"
-  }
-
-  set {
-    name  = "controller.resources.requests.cpu"
-    value = "100m"
-  }
-
-  set {
-    name  = "controller.resources.requests.memory"
-    value = "128Mi"
-  }
+  set = [
+    {
+      name  = "settings.clusterName"
+      value = data.aws_eks_cluster.this.name
+    },
+    {
+      name  = "settings.clusterEndpoint"
+      value = data.aws_eks_cluster.this.endpoint
+    },
+    {
+      name  = "settings.aws.defaultInstanceProfile"
+      value = aws_iam_instance_profile.karpenter_node[0].name
+    },
+    {
+      name  = "settings.aws.interruptionQueueName"
+      value = aws_sqs_queue.karpenter_interruption[0].name
+    },
+    {
+      name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+      value = aws_iam_role.karpenter[0].arn
+      type  = "string"
+    },
+    {
+      name  = "controller.nodeSelector.eks\\.amazonaws\\.com/compute-type"
+      value = "ec2"
+    },
 
 
-
-  #####################
-
-  # Pod ke env vars ke liye (container ke andar use karne ke liye)
-  set {
-    name  = "controller.env[0].name"
-    value = "CLUSTER_NAME"
-  }
-
-  set {
-    name  = "controller.env[0].value"
-    value = data.aws_eks_cluster.this.name
-  }
-
-  set {
-    name  = "controller.env[1].name"
-    value = "CLUSTER_ENDPOINT"
-  }
-
-  set {
-    name  = "controller.env[1].value"
-    value = data.aws_eks_cluster.this.endpoint
-  }
-
-
-
-
-  # 🔥 Add these to fix cert issue
-  set {
-    name  = "webhook.enabled"
-    value = "false"
-  }
-
-  set {
-    name  = "webhook.certificate.certManager.enabled"
-    value = "false"
-  }
-
-  set {
-    name  = "webhook.certificate.custom.enabled"
-    value = "false"
-  }
-
-  set {
-    name  = "webhook.certificate.selfSigned.enabled"
-    value = "false"
-  }
+  ]
 }
 
 
