@@ -11,11 +11,11 @@ module "helm-charts" {
   calico_enabled            = false
   csi_secrets_store_enabled = false
   csi_enabled_namespaces    = ["test"]
-  enabled_metrics_server    = true
+  enabled_metrics_server    = false
   cert_manager_email        = "example@gmail.com"
   cluster_name              = tostring(data.aws_eks_cluster.this.name)
-  vpc_id                    = ""
-  region                    = ""
+  vpc_id                    = data.aws_vpc.vpc.id
+  region                    = "eu-west-1"
 
 
 

@@ -7,36 +7,36 @@ resource "helm_release" "cert-manager" {
   create_namespace = true
   version          = var.cert_manager_version
 
-  set {
-    name  = "installCRDs"
-    value = true
-  }
-
-  set {
-    name  = "global.leaderElection.namespace"
-    value = var.cert_manager_leader_election_namespace
-  }
-
-  dynamic "set" {
-    for_each = var.cert_manager_resources != null ? tomap(var.cert_manager_resources) : {}
-    content {
-      name  = "global.resources.${set.key}.cpu"
-      value = try(set.value.cpu, null)
-    }
-  }
-
-  dynamic "set" {
-    for_each = var.cert_manager_resources != null ? tomap(var.cert_manager_resources) : {}
-    content {
-      name  = "global.resources.${set.key}.memory"
-      value = try(set.value.memory, null)
-    }
-  }
+  set = concat(
+    [
+      {
+        name  = "installCRDs"
+        value = true
+      },
+      {
+        name  = "global.leaderElection.namespace"
+        value = var.cert_manager_leader_election_namespace
+      }
+    ],
+    var.cert_manager_resources != null ? flatten([
+      for k, v in tomap(var.cert_manager_resources) : [
+        {
+          name  = "global.resources.${k}.cpu"
+          value = try(v.cpu, null)
+        },
+        {
+          name  = "global.resources.${k}.memory"
+          value = try(v.memory, null)
+        }
+      ]
+    ]) : []
+  )
 
   depends_on = [
     helm_release.nginx
   ]
 }
+
 
 locals {
   cert_manager_cluster_issuer = <<EOF

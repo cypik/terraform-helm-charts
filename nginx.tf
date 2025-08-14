@@ -11,12 +11,12 @@ resource "helm_release" "nginx" {
     var.nginx_yml_file == null ? file("${path.module}/nginx.yml") : "${var.nginx_yml_file}"
   ]
 
-  set {
-    name  = "controller.ingressClass"
-    value = var.nginx_name
-  }
-
-
+  set = [
+    {
+      name  = "controller.ingressClass"
+      value = var.nginx_name
+    }
+  ]
 
 
 }

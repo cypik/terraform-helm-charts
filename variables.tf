@@ -1,5 +1,5 @@
 variable "storage_class" {
-  default     = "managed-csi"
+  default     = "gp2" # "managed-csi"
   description = "Storage Class to use for Persistence"
 }
 

@@ -14,6 +14,7 @@ resource "helm_release" "grafana" {
   create_namespace = true
   repository       = "https://grafana.github.io/helm-charts"
   version          = var.grafana_version
+
   values = [
     templatefile("${path.module}/grafana.yml", {
       GOOGLE_CLIENT_ID     = var.grafana_google_auth_client_id
@@ -28,38 +29,32 @@ resource "helm_release" "grafana" {
     var.grafana_extra_yml != null ? var.grafana_extra_yml : ""
   ]
 
-  set {
-    name  = "persistence.enabled"
-    value = var.grafana_persistence_storage
-  }
-
-  set {
-    name  = "adminUser"
-    value = var.grafana_admin_user
-  }
-
-  set {
-    name  = "adminPassword"
-    value = var.grafana_admin_password != "" ? var.grafana_admin_password : random_password.grafana_admin_password[0].result
-
-  }
-
-  dynamic "set" {
-    for_each = var.grafana_persistence_storage != false ? [1] : []
-    content {
-      name  = "persistence.storageClassName"
-      value = var.grafana_efs_storage_class_name
-    }
-  }
-
-  # until upstream is fixed
-  # https://github.com/grafana/helm-charts/issues/814
-  dynamic "set" {
-    for_each = var.grafana_efs_enable != false ? [1] : []
-    content {
-      name  = "initChownData.enabled"
-      value = "false"
-    }
-  }
-
+  set = concat(
+    [
+      {
+        name  = "persistence.enabled"
+        value = var.grafana_persistence_storage
+      },
+      {
+        name  = "adminUser"
+        value = var.grafana_admin_user
+      },
+      {
+        name  = "adminPassword"
+        value = var.grafana_admin_password != "" ? var.grafana_admin_password : random_password.grafana_admin_password[0].result
+      }
+    ],
+    var.grafana_persistence_storage != false ? [
+      {
+        name  = "persistence.storageClassName"
+        value = var.grafana_efs_storage_class_name
+      }
+    ] : [],
+    var.grafana_efs_enable != false ? [
+      {
+        name  = "initChownData.enabled"
+        value = "false"
+      }
+    ] : []
+  )
 }
