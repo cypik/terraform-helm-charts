@@ -14,8 +14,7 @@ module "helm-charts" {
   enabled_metrics_server    = false
   cert_manager_email        = "example@gmail.com"
   cluster_name              = tostring(data.aws_eks_cluster.this.name)
-  vpc_id                    = data.aws_vpc.vpc.id
-  region                    = "eu-west-1"
+  vpc_id                    = "" # vpc_id is required only when ALB Ingress Controller is enabled (alb_ingress_enabled = true)
 
 }
 

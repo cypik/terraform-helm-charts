@@ -44,8 +44,7 @@ module "helm-charts" {
   csi_secrets_store_enabled = false
   csi_enabled_namespaces    = ["test"]
   cluster_name              = ""
-  vpc_id                    = ""
-  region                   = "eu-west-1"
+  vpc_id                    = ""  # vpc_id is required only when ALB Ingress Controller is enabled (alb_ingress_enabled = true)
 }
 
 <!-- BEGIN_TF_DOCS -->
