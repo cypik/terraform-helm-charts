@@ -1,4 +1,4 @@
-# Cluster and Auth Data
+## Cluster and Auth Data
 
 data "aws_eks_cluster" "this" {
   name = var.cluster_name

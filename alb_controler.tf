@@ -70,7 +70,6 @@ resource "helm_release" "aws_load_balancer_controller" {
   namespace  = "kube-system"
   version    = "1.7.1"
 
-  depends_on = [kubernetes_service_account.aws_lb_controller_sa]
 
   set = [
     {
@@ -93,5 +92,9 @@ resource "helm_release" "aws_load_balancer_controller" {
       name  = "vpcId"
       value = var.vpc_id
     }
+  ]
+
+  depends_on = [
+    kubernetes_service_account.aws_lb_controller_sa
   ]
 }

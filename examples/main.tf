@@ -17,7 +17,5 @@ module "helm-charts" {
   vpc_id                    = data.aws_vpc.vpc.id
   region                    = "eu-west-1"
 
-
-
 }
 

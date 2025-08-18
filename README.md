@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong>Modular, Scalable, Production-Ready Kubernetes Deployments</strong><br/>
-  Grafana • Loki • Prometheus • KEDA • NGINX • Cert Manager
+  Grafana • Loki • Prometheus • KEDA • NGINX • Cert Manager . karpenter . aws-load-balancer-controller. metrics-server . secrets-store-csi-driver
 </p>
 
 ---
@@ -29,14 +29,23 @@ It includes toggle-able support for:
 
 ```hcl
 module "helm-charts" {
-  source                = "../../.."
-  enable_nginx          = true
-  enable_keda           = false
-  grafana_enabled       = true
-  grafana_loki_enabled  = true
-  prometheus_enabled    = true
-  cert_manager_enabled  = true
-  cert_manager_email    = "admin@cypik.com"
+  source                    = "../../.."
+  enable_nginx              = true
+  enable_keda               = false
+  grafana_enabled           = true
+  grafana_loki_enabled      = true
+  prometheus_enabled        = true
+  cert_manager_enabled      = true
+  cert_manager_email        = "admin@cypik.com"
+  enabled_karpenter         = true
+  alb_ingress_enabled       = false
+  enabled_metrics_server    = false
+  calico_enabled            = false
+  csi_secrets_store_enabled = false
+  csi_enabled_namespaces    = ["test"]
+  cluster_name              = ""
+  vpc_id                    = ""
+  region                   = "eu-west-1"
 }
 
 <!-- BEGIN_TF_DOCS -->
