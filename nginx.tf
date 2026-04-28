@@ -1,6 +1,6 @@
 resource "helm_release" "nginx" {
-  count            = var.enable_nginx ? 1 : 0
-  name             = var.nginx_name
+  count            = var.nginx_ingress_enabled ? 1 : 0
+  name             = "nginx-ingress"
   repository       = "https://kubernetes.github.io/ingress-nginx"
   chart            = "ingress-nginx"
   namespace        = "nginx-ingress"
@@ -11,12 +11,6 @@ resource "helm_release" "nginx" {
     var.nginx_yml_file == null ? file("${path.module}/nginx.yml") : "${var.nginx_yml_file}"
   ]
 
-  set = [
-    {
-      name  = "controller.ingressClass"
-      value = var.nginx_name
-    }
-  ]
 
 
 }

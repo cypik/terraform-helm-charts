@@ -8,21 +8,21 @@ resource "helm_release" "prometheus" {
   repository       = "https://prometheus-community.github.io/helm-charts"
   version          = var.prometheus_version
 
-  values = length(var.prometheus_additional_scrape_configs) > 0 ? [
-    templatefile("${path.module}/prometheus_additional_scrape_config.yml", {
-      SCRAPE_CONFIG = var.prometheus_additional_scrape_configs,
-    }),
-  ] : []
+  values = compact([
+    file("${path.module}/prometheus_additional_scrape_config.yml"),
+    var.prometheus_custom_values != null ? var.prometheus_custom_values : null
+  ])
+
 
   set = concat(
     [
       {
         name  = "podSecurityPolicy.enabled"
-        value = true
+        value = var.prometheus_pod_security_policy_enabled
       },
       {
         name  = "server.retention"
-        value = "1d"
+        value = var.prometheus_server_retention
       },
       {
         name  = "server.persistentVolume.enabled"
@@ -30,7 +30,7 @@ resource "helm_release" "prometheus" {
       },
       {
         name  = "server.persistentVolume.storageClass"
-        value = var.storage_class
+        value = var.prometheus_storage_class != null ? var.prometheus_storage_class : var.storage_class
       }
     ],
     length(var.pushgateway_ingress_host) > 0 ? [
@@ -44,17 +44,17 @@ resource "helm_release" "prometheus" {
     var.prometheus_persistence_storage != false ? [
       {
         name  = "server.persistentVolume.existingClaim"
-        value = ""
+        value = var.prometheus_persistent_volume_existing_claim
       },
       {
         name  = "server.persistentVolume.size"
-        value = "8Gi"
+        value = var.prometheus_persistent_volume_size
       }
     ] : [],
     [
       {
         name  = "alertmanager.persistence.enabled"
-        value = false
+        value = var.alertmanager_persistence_enabled
       }
     ]
   )

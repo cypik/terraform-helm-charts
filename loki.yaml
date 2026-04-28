@@ -6,7 +6,8 @@ loki:
   storage:
     type: filesystem
     filesystem:
-      dir: /var/loki/chunks
+      chunks_directory: /var/loki/chunks
+      rules_directory: /var/loki/rules
 
   schemaConfig:
     configs:
@@ -19,6 +20,9 @@ loki:
           period: 24h
 
   storage_config:
+    boltdb_shipper:
+      active_index_directory: /var/loki/index
+      cache_location: /var/loki/boltdb-cache
     filesystem:
       directory: /var/loki/chunks
 
@@ -64,7 +68,7 @@ singleBinary:
     storageClass: ${storage_class}
     accessModes:
       - ReadWriteOnce
-    size: 10Gi
+    size: ${storage_size}
     mountPath: /var/loki
 
   resources:

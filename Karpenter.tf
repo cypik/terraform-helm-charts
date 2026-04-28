@@ -7,7 +7,7 @@ data "aws_iam_openid_connect_provider" "oidc" {
 
 # IAM Role for Karpenter Controller
 resource "aws_iam_role" "karpenter" {
-  count = var.enabled_karpenter ? 1 : 0
+  count = var.karpenter_enabled ? 1 : 0
   name  = "karpenter-controller-${var.cluster_name}"
 
   assume_role_policy = jsonencode({
@@ -32,7 +32,7 @@ resource "aws_iam_role" "karpenter" {
 
 # IAM Policy for Karpenter Controller
 resource "aws_iam_role_policy" "karpenter_controller_policy" {
-  count = var.enabled_karpenter ? 1 : 0
+  count = var.karpenter_enabled ? 1 : 0
   name  = "karpenter-controller-policy"
   role  = aws_iam_role.karpenter[0].id
 
@@ -155,7 +155,7 @@ resource "aws_iam_role_policy" "karpenter_controller_policy" {
 
 
 resource "aws_iam_role" "karpenter_node" {
-  count = var.enabled_karpenter ? 1 : 0
+  count = var.karpenter_enabled ? 1 : 0
   name  = "KarpenterNodeRole-${var.cluster_name}"
 
   assume_role_policy = jsonencode({
@@ -174,7 +174,7 @@ resource "aws_iam_role" "karpenter_node" {
 
 # ---------- Attach AWS Managed Policies to Node Role ----------
 resource "aws_iam_role_policy_attachment" "karpenter_node_managed_policies" {
-  count = var.enabled_karpenter ? 4 : 0
+  count = var.karpenter_enabled ? 4 : 0
   role  = aws_iam_role.karpenter_node[0].name
   policy_arn = element([
     "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
@@ -187,14 +187,14 @@ resource "aws_iam_role_policy_attachment" "karpenter_node_managed_policies" {
 
 # Instance Profile for EC2 Nodes
 resource "aws_iam_instance_profile" "karpenter_node" {
-  count = var.enabled_karpenter ? 1 : 0
+  count = var.karpenter_enabled ? 1 : 0
   name  = "karpenter-instance-profile-${var.cluster_name}"
   role  = aws_iam_role.karpenter_node[0].name
 }
 
 # SQS Queue for Spot Interruption Handling
 resource "aws_sqs_queue" "karpenter_interruption" {
-  count = var.enabled_karpenter ? 1 : 0
+  count = var.karpenter_enabled ? 1 : 0
   name  = "${var.cluster_name}-karpenter-interruption"
 }
 
@@ -203,12 +203,12 @@ resource "aws_sqs_queue" "karpenter_interruption" {
 
 # Helm Chart Deployment for Karpenter
 resource "helm_release" "karpenter" {
-  count            = var.enabled_karpenter ? 1 : 0
+  count            = var.karpenter_enabled ? 1 : 0
   name             = "karpenter"
   namespace        = "karpenter"
   repository       = "oci://public.ecr.aws/karpenter"
   chart            = "karpenter"
-  version          = "1.6.1"
+  version          = var.karpenter_version
   create_namespace = true
 
   set = [

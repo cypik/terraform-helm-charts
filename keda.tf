@@ -1,5 +1,5 @@
 resource "helm_release" "keda" {
-  count            = var.enable_keda ? 1 : 0
+  count            = var.keda_enabled ? 1 : 0
   name             = var.keda_name
   repository       = "https://kedacore.github.io/charts"
   chart            = "keda"

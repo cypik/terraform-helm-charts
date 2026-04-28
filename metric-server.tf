@@ -1,10 +1,10 @@
 resource "helm_release" "metrics_server" {
-  count      = var.enabled_metrics_server ? 1 : 0
+  count      = var.metrics_server_enabled ? 1 : 0
   name       = "metrics-server"
   repository = "https://kubernetes-sigs.github.io/metrics-server/"
   chart      = "metrics-server"
   namespace  = "kube-system"
-  version    = "3.13.0"
+  version    = var.metrics_server_version
 
   values = [
     yamlencode({
