@@ -7,11 +7,16 @@ resource "helm_release" "loki" {
   repository       = "https://grafana.github.io/helm-charts"
   version          = var.loki_version
 
-  values = [
-    templatefile("${path.module}/loki.yaml", {
-      storage_class = var.storage_class
-    }),
-  ]
+  values = compact([
+    templatefile(
+      "${path.module}/loki.yaml",
+      {
+        storage_class = var.storage_class
+        storage_size  = var.loki_storage_size
+      }
+    ),
+    var.loki_custom_values != null ? var.loki_custom_values : null
+  ])
 }
 
 # -------------------------
@@ -26,18 +31,18 @@ resource "helm_release" "promtail" {
   repository       = "https://grafana.github.io/helm-charts"
   version          = var.promtail_version
 
-  set {
-    name  = "config.logLevel"
-    value = "info"
-  }
-
-  set {
-    name  = "config.serverPort"
-    value = "3101"
-  }
-
-  set {
-    name  = "config.clients[0].url"
-    value = "http://loki-gateway.loki.svc.cluster.local/loki/api/v1/push"
-  }
+  set = [
+    {
+      name  = "config.logLevel"
+      value = "info"
+    },
+    {
+      name  = "config.serverPort"
+      value = "3101"
+    },
+    {
+      name  = "config.clients[0].url"
+      value = "http://loki-gateway.loki.svc.cluster.local/loki/api/v1/push"
+    }
+  ]
 }

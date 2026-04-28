@@ -4,6 +4,7 @@ datasources:
     datasources:
       - name: Prometheus
         type: prometheus
+        uid: Prometheus
         url: http://prometheus-server.prometheus.svc.cluster.local
         access: proxy
         isDefault: false
@@ -11,8 +12,20 @@ datasources:
       %{ if grafana_loki_enabled }
       - name: Loki
         type: loki
+        uid: Loki
         url:  http://loki-gateway.loki.svc.cluster.local
         access: proxy
+        isDefault: false
+      %{ endif }
+
+      %{ if rds_cloudwatch_datasource_enabled }
+      - name: CloudWatch
+        type: cloudwatch
+        uid: CloudWatch
+        access: proxy
+        jsonData:
+          authType: default
+          defaultRegion: ${grafana_cloudwatch_region}
         isDefault: false
       %{ endif }
 
@@ -35,6 +48,14 @@ sidecar:
     searchNamespace: ALL
     provider:
       foldersFromFilesStructure: true
+
+serviceAccount:
+  create: true
+  name: grafana
+  %{ if grafana_service_account_role_arn != "" }
+  annotations:
+    eks.amazonaws.com/role-arn: ${grafana_service_account_role_arn}
+  %{ endif }
 
 grafana.ini:
   auth.google:
@@ -59,12 +80,121 @@ grafana.ini:
     %{ endfor }
 
 ingress:
-  ingressClassName: nginx
   enabled: ${INGRESS_ENABLED}
+
+  %{ if INGRESS_TYPE == "alb" }
+  ingressClassName: alb
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/backend-protocol: HTTP
+    alb.ingress.kubernetes.io/healthcheck-path: /grafana/login
+
+    %{ if ACM_CERT_ARN != "" }
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80},{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+    alb.ingress.kubernetes.io/certificate-arn: ${ACM_CERT_ARN}
+    %{ else }
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
+    %{ endif }
+  %{ endif }
+
+  %{ if INGRESS_TYPE == "nginx" }
+  ingressClassName: nginx
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/proxy-body-size: 50m
+
+    %{ if CERT_MANAGER_ENABLED }
+    cert-manager.io/cluster-issuer: letsencrypt
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    %{ endif }
+  %{ endif }
+
   hosts:
     %{ for host in INGRESS_HOSTS }
     - ${host}
     %{ endfor }
-  path: "/grafana"
+
+  %{ if INGRESS_TYPE == "nginx" && CERT_MANAGER_ENABLED }
+  tls:
+    - secretName: grafana-tls
+      hosts:
+        %{ for host in INGRESS_HOSTS }
+        - ${host}
+        %{ endfor }
+  %{ endif }
+
+  paths:
+    - path: /grafana
+      pathType: Prefix
+
+persistence:
+  enabled: ${grafana_persistence_enabled}
+  storageClassName: ${grafana_persistence_storage_class}
+  accessModes: [${join(", ", formatlist("\"%s\"", grafana_persistence_access_modes))}]
+  size: ${grafana_persistence_size}
+
+%{ if mysql_exporter_enabled || node_exporter_dashboard_enabled || rds_cloudwatch_datasource_enabled }
+dashboardProviders:
+  dashboardproviders.yaml:
+    apiVersion: 1
+    providers:
+      %{ if mysql_exporter_enabled }
+      - name: db
+        orgId: 1
+        folder: DB
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards/db
+      %{ endif }
+      %{ if node_exporter_dashboard_enabled }
+      - name: nodes
+        orgId: 1
+        folder: Nodes
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards/nodes
+      %{ endif }
+      %{ if rds_cloudwatch_datasource_enabled }
+      - name: aws-rds
+        orgId: 1
+        folder: AWS RDS
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards/aws-rds
+      %{ endif }
+
+dashboards:
+  %{ if mysql_exporter_enabled }
+  db:
+    mysql-overview:
+      gnetId: 7362
+      revision: 5
+      datasource: Prometheus
+  %{ endif }
+  %{ if node_exporter_dashboard_enabled }
+  nodes:
+    node-exporter-full:
+      gnetId: 1860
+      revision: 37
+      datasource: Prometheus
+  %{ endif }
+  %{ if rds_cloudwatch_datasource_enabled }
+  aws-rds:
+    aws-rds-overview:
+      gnetId: 707
+      revision: 7
+      datasource: CloudWatch
+  %{ endif }
+%{ endif }
 
 assertNoLeakedSecrets: false

@@ -1,5 +1,5 @@
 resource "helm_release" "keda" {
-  count            = var.enable_keda ? 1 : 0
+  count            = var.keda_enabled ? 1 : 0
   name             = var.keda_name
   repository       = "https://kedacore.github.io/charts"
   chart            = "keda"
@@ -9,6 +9,14 @@ resource "helm_release" "keda" {
   timeout          = 600
 
   values = [
-    var.keda_yml_file == null ? file("${path.module}/keda.yaml") : "${var.keda_yml_file}"
+    yamlencode({
+      prometheus = {
+        metricServer = {
+          enabled = true
+        }
+      }
+    })
   ]
+
+  depends_on = [helm_release.metrics_server]
 }
