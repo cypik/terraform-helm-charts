@@ -1,4 +1,4 @@
-<p align="center">
+`<p align="center">
   <img src="https://github.com/cypik.png" alt="Cypik Logo" width="120"/>
 </p>
 
@@ -40,7 +40,7 @@ Each component is independently toggle-able. Components that are cloud-specific 
 ```hcl
 module "helm-charts" {
   source     = "cypik/terraform-helm-charts/aws"
-  version    = "1.0.0"
+  version    = "1.0.1"
 
   # Cluster
   cluster_name        = "my-eks-cluster"

@@ -12,7 +12,7 @@ locals {
 
 module "vpc" {
   source      = "cypik/vpc/aws"
-  version     = "1.0.3"
+  version     = "1.0.5"
   name        = "${local.name}-vpc"
   environment = local.environment
   cidr_block  = "10.10.0.0/16"
@@ -20,7 +20,7 @@ module "vpc" {
 
 module "subnets" {
   source              = "cypik/subnet/aws"
-  version             = "1.0.5"
+  version             = "1.0.7"
   name                = "${local.name}-subnet"
   environment         = local.environment
   nat_gateway_enabled = true
@@ -43,7 +43,7 @@ module "subnets" {
 
 module "ssh" {
   source      = "cypik/security-group/aws"
-  version     = "1.0.2"
+  version     = "1.0.4"
   name        = "${local.name}-ssh"
   environment = local.environment
   vpc_id      = module.vpc.vpc_id
@@ -78,7 +78,7 @@ module "ssh" {
 
 module "http_https" {
   source      = "cypik/security-group/aws"
-  version     = "1.0.2"
+  version     = "1.0.4"
   name        = "${local.name}-http-https"
   environment = local.environment
   vpc_id      = module.vpc.vpc_id
@@ -117,7 +117,7 @@ module "http_https" {
 
 module "kms" {
   source              = "cypik/kms/aws"
-  version             = "1.0.2"
+  version             = "1.0.4"
   name                = "${local.name}-kms"
   environment         = local.environment
   enabled             = true
@@ -145,7 +145,7 @@ data "aws_caller_identity" "current" {}
 
 module "eks" {
   source      = "cypik/eks/aws"
-  version     = "1.0.7"
+  version     = "1.0.8"
   enabled     = true
   name        = local.name
   environment = local.environment
@@ -229,12 +229,12 @@ module "helm-charts" {
 
   ## cert manager
   cert_manager_enabled = true
-  cert_manager_email   = "mahesh.y@cypik.com"
+  cert_manager_email   = "example@gmail.com"
 
   # grafana
   grafana_enabled       = true
   grafana_ingress_hosts = ["grafana.opsstation.com"]
-  # grafana_acm_certificate_arn = "arn:aws:acm:us-east-1:xxxxxxxxxxxx:certificate/cc7933b1-d4e3-4be1-9b16-8c90f1781efa"
+  # grafana_acm_certificate_arn = "arn:aws:acm:us-east-1:xxxxxxxxxxxx:certificate/cc7933b1-d4e3-4be1-9b16-xxxxxxxx"
   grafana_loki_enabled = true
   prometheus_enabled   = true
 
